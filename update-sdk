@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+version=$1
+
+curl -L "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v$version/sha256.sum" | jq -R -n "[ inputs | split(\" \") | {(.[2]): .[0]} ] | add | { \"files\": ., \"version\": \"$version\"}" > sdk.json
