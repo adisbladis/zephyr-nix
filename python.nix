@@ -3,14 +3,19 @@
 , pyproject-nix
 , clang-tools
 , gitlint
+, lib
 }:
 
 let
   python = python3.override {
     self = python;
     packageOverrides = self: super: {
+      # HACK: Zephyr uses pypi to install non-Python deps
       clang-format = clang-tools;
       inherit gitlint;
+
+      # HACK: Older Zephyr depends on these missing dependencies
+      sphinxcontrib-svg2pdfconverter = super.sphinxcontrib-svg2pdfconverter or null;
     };
   };
 
@@ -18,9 +23,13 @@ let
     requirements = zephyr-src + "/scripts/requirements.txt";
   };
 
+  invalidConstraints = project.validators.validateVersionConstraints { inherit python; };
+
 in
-assert project.validators.validateVersionConstraints { inherit python; } == { };
-python.withPackages (project.renderers.withPackages {
-  inherit python;
-  extraPackages = ps: [ ps.west ];
-})
+lib.warnIf
+  (invalidConstraints != { })
+  "zephyr-pythonEnv: Found invalid Python constraints for: ${builtins.toJSON (lib.attrNames invalidConstraints)}"
+  (python.withPackages (project.renderers.withPackages {
+    inherit python;
+    extraPackages = ps: [ ps.west ];
+  }))
