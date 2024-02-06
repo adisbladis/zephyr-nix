@@ -4,8 +4,34 @@ Develop Zephyr projects using Nix
 
 ## Features
 
-- SDK packaging
-- Host tools packaging
+* SDK packaging
+  * `sdk`
+
+  The minimal SDK.
+  Can be overriden with additional targets.
+
+  ``` nix
+  sdk.override {
+    targets = [
+      "arm-zephyr-eabi"
+    ];
+  }
+  ```
+
+  * `sdkFull`
+
+  SDK with all targets enabled.
+
+* Host tools packaging
+
+  * `hosttools`
+
+  Binary `hosttools` from the Zephyr SDK.
+  Because of libc incompatibilities not all binaries in this derivation actually works.
+
+  * `hosttools-nix`
+
+  A re-packaging of the Zephyr SDK hosttools using nixpkgs packages.
 
 ## Basic usage
 
@@ -29,11 +55,11 @@ mkShell {
     ninja
   ];
 
-  env.ZEPHYR_SDK_INSTALL_DIR = zephyr.sdk.overrideAttrs(old: {
-    targets = old.targets ++ [
+  env.ZEPHYR_SDK_INSTALL_DIR = zephyr.sdk.override {
+    targets = [
       "arm-zephyr-eabi"
     ];
-  });
+  };
 }
 ```
 

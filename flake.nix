@@ -18,16 +18,17 @@
     {
       packages =
         forAllSystems
-        (
-          system:
-          let
-            pkgs = nixpkgs.legacyPackages.${system};
-          in
-          pkgs.callPackages ./. {
-            zephyr-src = zephyr;
-            inherit pyproject-nix;
-          }
-        );
+          (
+            system:
+            let
+              pkgs = nixpkgs.legacyPackages.${system};
+            in
+            builtins.removeAttrs
+              (pkgs.callPackage ./. {
+                zephyr-src = zephyr;
+                inherit pyproject-nix;
+              }) [ "override" "overrideDerivation" ]
+          );
     }
   );
 }
