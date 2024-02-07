@@ -77,10 +77,18 @@ rec {
           runHook preInstall
 
           rm zephyr-sdk-$version/zephyr-sdk-${arch}-hosttools-standalone-*.sh
-          rm zephyr-sdk-$version/setup.sh;
+          rm -f env-vars
 
           mv zephyr-sdk-$version $out
-          mv $(ls | grep -v env-vars) $out/
+
+          if [ -n "$(ls -A .)" ]; then
+            mv * $out
+          fi
+
+          mkdir -p $out/nix-support
+          cat <<EOF >> $out/nix-support/setup-hook
+          export ZEPHYR_SDK_INSTALL_DIR=$out
+          EOF
 
           runHook postInstall
         '';

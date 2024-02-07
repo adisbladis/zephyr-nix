@@ -48,6 +48,11 @@ Develop Zephyr projects using Nix
 
 mkShell {
   packages = [
+    (zephyr.sdk.override {
+      targets = [
+        "arm-zephyr-eabi"
+      ];
+    })
     zephyr.pythonEnv
     # Use zephyr.hosttools-nix to use nixpkgs built tooling instead of official Zephyr binaries
     zephyr.hosttools
@@ -55,11 +60,6 @@ mkShell {
     ninja
   ];
 
-  env.ZEPHYR_SDK_INSTALL_DIR = zephyr.sdk.override {
-    targets = [
-      "arm-zephyr-eabi"
-    ];
-  };
 }
 ```
 
