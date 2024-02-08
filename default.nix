@@ -64,7 +64,10 @@ rec {
           inherit platform arch targets;
         };
 
-        nativeBuildInputs = [ which cmake autoPatchelfHook ];
+        nativeBuildInputs =
+          [ which cmake ]
+          ++ lib.optional (!stdenv.isDarwin) autoPatchelfHook
+          ;
 
         buildInputs = [ stdenv.cc.cc python3 ];
 
@@ -123,7 +126,10 @@ rec {
 
         src = fetchSDKFile "hosttools_${platform}-${arch}.tar.xz";
 
-        nativeBuildInputs = [ which autoPatchelfHook ];
+        nativeBuildInputs =
+          [ which ]
+          ++ lib.optional (!stdenv.isDarwin) autoPatchelfHook
+          ;
 
         buildInputs = [ python3 ];
 
