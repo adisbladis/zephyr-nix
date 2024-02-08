@@ -16,6 +16,8 @@
       forAllSystems = lib.genAttrs lib.systems.flakeExposed;
     in
     {
+      checks = self.packages;
+
       packages =
         forAllSystems
           (
