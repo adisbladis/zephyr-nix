@@ -4,6 +4,10 @@
 , lib
 , fetchurl
 , python38
+, newScope
+, openocd
+, autoreconfHook
+, fetchFromGitHub
 }:
 
 let
@@ -32,7 +36,10 @@ let
   };
 
 in
-rec {
+lib.makeScope newScope (self: let
+  inherit (self) callPackage;
+in {
+
   # Zephyr/west Python environment.
   pythonEnv = callPackage ./python.nix {
     inherit zephyr-src;
@@ -101,11 +108,11 @@ rec {
   # # SDK with all targets selected
   sdkFull =
     let
-      inherit (sdk.passthru) platform arch;
+      inherit (self.sdk.passthru) platform arch;
       mToolchain = builtins.match "toolchain_${platform}-${arch}_(.+)\.tar\.xz";
       allTargets = map (x: builtins.head (mToolchain x)) (builtins.filter (f: mToolchain f != null) (lib.attrNames sdk'.files));
     in
-    sdk.override {
+    self.sdk.override {
       targets = allTargets;
     };
 
@@ -147,13 +154,32 @@ rec {
       })
     sdkArgs;
 
+  openocd-zephyr = openocd.overrideAttrs(old: let
+    pname = "openocd-zephyr";
+    version = "20220611";
+  in {
+    inherit pname version;
+    name = "${pname}-${version}";
+
+    nativeBuildInputs = old.nativeBuildInputs ++ [
+      autoreconfHook
+    ];
+
+    src = fetchFromGitHub {
+      owner = "zephyrproject-rtos";
+      repo = "openocd";
+      rev = "b6f95a16c1360e347a06faf91befd122c0d15864";
+      hash = "sha256-NItD5vrFlm3vfma5DexRYpGDsrl7yLjgmskiXPpbYP8=";
+    };
+  });
+
   # A variant of hosttools, but all tools are taken from nixpkgs.
   hosttools-nix = callPackage
     ({ stdenv
      , bossa
      , dtc
      , nettle
-     , openocd
+     , openocd-zephyr
      , qemu_full
      , shared-mime-info
      }: stdenv.mkDerivation {
@@ -166,7 +192,7 @@ rec {
         bossa
         dtc
         nettle
-        openocd
+        openocd-zephyr
         qemu_full
         shared-mime-info
       ];
@@ -176,4 +202,4 @@ rec {
       '';
     })
     { };
-}
+})
