@@ -29,7 +29,15 @@
               (pkgs.callPackage ./. {
                 zephyr-src = zephyr;
                 inherit pyproject-nix;
-              }) [ "override" "overrideDerivation" ]
+              }) [
+                "override"
+                "overrideDerivation"
+                "callPackage"
+                "overrideScope"
+                "overrideScope'"
+                "newScope"
+                "packages"
+              ]
           );
     }
   );
