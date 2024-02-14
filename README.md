@@ -86,7 +86,7 @@ mkShell {
     pkgs = nixpkgs.legacyPackages.x86_64-linux;
     zephyr = zephyr-nix.packages.x86_64-linux;
   in {
-    devShell.x86_64-linux.default = pkgs.mkShell {
+    devShells.x86_64-linux.default = pkgs.mkShell {
       # Use the same mkShell as documented above
     };
   };
