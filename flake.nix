@@ -5,6 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     pyproject-nix.url = "github:nix-community/pyproject.nix";
+    pyproject-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     zephyr.url = "github:zephyrproject-rtos/zephyr/v3.5.0";
     zephyr.flake = false;
