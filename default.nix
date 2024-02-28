@@ -5,6 +5,7 @@
 , python38
 , newScope
 , openocd
+, gcc_multi
 , autoreconfHook
 , fetchFromGitHub
 }:
@@ -195,7 +196,9 @@ in {
         openocd-zephyr
         qemu_full
         shared-mime-info
-      ];
+      ]
+      ++ lib.optional (stdenv.hostPlatform.system == "x86_64-linux") gcc_multi
+      ;
 
       installPhase = ''
         mkdir $out
