@@ -1,7 +1,7 @@
 { python3
 , zephyr-src
 , pyproject-nix
-, clang-tools
+, clang-tools_17
 , gitlint
 , lib
 }:
@@ -11,7 +11,7 @@ let
     self = python;
     packageOverrides = self: super: {
       # HACK: Zephyr uses pypi to install non-Python deps
-      clang-format = clang-tools;
+      clang-format = clang-tools_17;
       inherit gitlint;
 
       # HACK: Older Zephyr depends on these missing dependencies
