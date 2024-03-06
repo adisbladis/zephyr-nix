@@ -6,6 +6,7 @@
 , python38
 , newScope
 , openocd
+, gcc_multi
 , autoreconfHook
 , fetchFromGitHub
 }:
@@ -202,4 +203,7 @@ in {
       '';
     })
     { };
+
+    # other needed dependencies
+    inherit gcc_multi;
 })
