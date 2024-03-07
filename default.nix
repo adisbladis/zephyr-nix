@@ -1,5 +1,4 @@
-{ callPackage
-, zephyr-src
+{ zephyr-src
 , pyproject-nix
 , lib
 , fetchurl
