@@ -4,6 +4,7 @@
 , clang-tools_17
 , gitlint
 , lib
+, ...
 }:
 
 let
