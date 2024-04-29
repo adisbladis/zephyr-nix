@@ -1,6 +1,14 @@
-#!/usr/bin/env bash
+#! /usr/bin/env nix-shell
+#! nix-shell -i bash -p curl jq
+
 set -euo pipefail
 
 version=$1
 
-curl -L "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v$version/sha256.sum" | jq -R -n "[ inputs | split(\" \") | {(.[2]): .[0]} ] | add | { \"files\": ., \"version\": \"$version\"}" > sdk.json
+if [ -z "$version" ]; then
+    echo "ERROR: missing version argument. For example: ./update-sdk 0.16.6"
+    exit 1
+fi
+
+curl -L "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v$version/sha256.sum" \
+    | jq -R -n "[ inputs | split(\" \") | {(.[2]): .[0]} ] | add | { \"files\": ., \"version\": \"$version\"}" > sdk.json
