@@ -94,16 +94,16 @@
     "zephyr": {
       "flake": false,
       "locked": {
-        "lastModified": 1708734632,
-        "narHash": "sha256-iwEXEIA63JWSB6GcTNHHMZAEfMEwEfqcIWetF7VD2tU=",
+        "lastModified": 1721992675,
+        "narHash": "sha256-rmOHH0uRU27U2T4w4+FEMcAcuiZ7W7p4vOwtSwiAFNY=",
         "owner": "zephyrproject-rtos",
         "repo": "zephyr",
-        "rev": "468eb56cf242eedba62006ee758700ee6148763f",
+        "rev": "36940db938a8f4a1e919496793ed439850a221c2",
         "type": "github"
       },
       "original": {
         "owner": "zephyrproject-rtos",
-        "ref": "v3.6.0",
+        "ref": "v3.7.0",
         "repo": "zephyr",
         "type": "github"
       }

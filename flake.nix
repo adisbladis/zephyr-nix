@@ -7,7 +7,7 @@
     pyproject-nix.url = "github:nix-community/pyproject.nix";
     pyproject-nix.inputs.nixpkgs.follows = "nixpkgs";
 
-    zephyr.url = "github:zephyrproject-rtos/zephyr/v3.6.0";
+    zephyr.url = "github:zephyrproject-rtos/zephyr/v3.7.0";
     zephyr.flake = false;
   };
 
@@ -15,6 +15,16 @@
     let
       inherit (nixpkgs) lib;
       forAllSystems = lib.genAttrs lib.systems.flakeExposed;
+
+      clean = lib.flip removeAttrs [
+        "override"
+        "overrideDerivation"
+        "callPackage"
+        "overrideScope"
+        "overrideScope'"
+        "newScope"
+        "packages"
+      ];
     in
     {
       checks = self.packages;
@@ -26,19 +36,10 @@
             let
               pkgs = nixpkgs.legacyPackages.${system};
             in
-            builtins.removeAttrs
-              (pkgs.callPackage ./. {
+              clean (pkgs.callPackage ./. {
                 zephyr-src = zephyr;
                 inherit pyproject-nix;
-              }) [
-                "override"
-                "overrideDerivation"
-                "callPackage"
-                "overrideScope"
-                "overrideScope'"
-                "newScope"
-                "packages"
-              ]
+              })
           );
     }
   );
