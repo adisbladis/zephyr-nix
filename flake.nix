@@ -2,16 +2,19 @@
   description = "Build Zephyr projects on Nix";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
 
     pyproject-nix.url = "github:nix-community/pyproject.nix";
     pyproject-nix.inputs.nixpkgs.follows = "nixpkgs";
+
+    nixpkgs-python.url = "github:cachix/nixpkgs-python";
+    nixpkgs-python.inputs.nixpkgs.follows = "nixpkgs";
 
     zephyr.url = "github:zephyrproject-rtos/zephyr/v3.7.0";
     zephyr.flake = false;
   };
 
-  outputs = { self, nixpkgs, zephyr, pyproject-nix }: (
+  outputs = { self, nixpkgs, zephyr, pyproject-nix, nixpkgs-python }: (
     let
       inherit (nixpkgs) lib;
       forAllSystems = lib.genAttrs lib.systems.flakeExposed;
@@ -35,8 +38,13 @@
             system:
             let
               pkgs = nixpkgs.legacyPackages.${system};
+
+              callPackage = lib.callPackageWith (pkgs // {
+                python38 = nixpkgs-python.packages.${system}."3.8.19";
+              });
+
             in
-              clean (pkgs.callPackage ./. {
+              clean (callPackage ./. {
                 zephyr-src = zephyr;
                 inherit pyproject-nix;
               })
