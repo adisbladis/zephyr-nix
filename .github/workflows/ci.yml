@@ -8,7 +8,7 @@ on:
       - main
 
 jobs:
-  nix-flake-check:
+  flake:
     strategy:
       matrix:
         os: [ubuntu-latest]
