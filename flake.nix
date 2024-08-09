@@ -2,7 +2,7 @@
   description = "Build Zephyr projects on Nix";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     pyproject-nix.url = "github:nix-community/pyproject.nix";
     pyproject-nix.inputs.nixpkgs.follows = "nixpkgs";
@@ -40,7 +40,7 @@
               pkgs = nixpkgs.legacyPackages.${system};
 
               callPackage = lib.callPackageWith (pkgs // {
-                python38 = nixpkgs-python.packages.${system}."3.8.19";
+                python38 = nixpkgs-python.packages.${system}."3.8";
               });
 
             in
