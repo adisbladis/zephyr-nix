@@ -92,3 +92,7 @@ mkShell {
   };
 }
 ```
+
+## Building a west project with Nix
+
+For building [west](https://docs.zephyrproject.org/latest/develop/west/index.html) projects with Nix you can use [west2nix](https://github.com/adisbladis/west2nix).
