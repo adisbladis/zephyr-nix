@@ -19,8 +19,8 @@ let
     else throw "Unsupported platform";
 
   getArch = stdenv:
-    if stdenv.isLinux then stdenv.hostPlatform.linuxArch
-    else if stdenv.isDarwin then stdenv.hostPlatform.darwinArch
+    if stdenv.isAarch64 then "aarch64"
+    else if stdenv.isx86_64 then "x86_64"
     else throw "Unsupported arch";
 
   baseURL = "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${version}";
