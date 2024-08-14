@@ -86,7 +86,7 @@ in {
         installPhase = ''
           runHook preInstall
 
-          rm zephyr-sdk-$version/zephyr-sdk-${arch}-hosttools-standalone-*.sh
+          rm -f zephyr-sdk-$version/zephyr-sdk-${arch}-hosttools-standalone-*.sh
           rm -f env-vars
 
           mv zephyr-sdk-$version $out
