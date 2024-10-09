@@ -1,161 +1,29 @@
 { zephyr-src
 , pyproject-nix
 , lib
-, fetchurl
-, python310
 , newScope
 , openocd
 , gcc_multi
 , autoreconfHook
 , fetchFromGitHub
+, pkgs
 }:
 
-let
-  sdk' = lib.importJSON ./sdk.json;
-  inherit (sdk') version;
-
-  getPlatform = stdenv:
-    if stdenv.isLinux then "linux"
-    else if stdenv.isDarwin then "macos"
-    else throw "Unsupported platform";
-
-  getArch = stdenv:
-    if stdenv.isAarch64 then "aarch64"
-    else if stdenv.isx86_64 then "x86_64"
-    else throw "Unsupported arch";
-
-  baseURL = "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${version}";
-
-  fetchSDKFile = file: fetchurl {
-    url = "${baseURL}/${file}";
-    sha256 = sdk'.files.${file};
-  };
-
-  sdkArgs = {
-    python3 = python310;
-  };
-
-in
 lib.makeScope newScope (self: let
   inherit (self) callPackage;
+
+  sdk = callPackage (import ./sdk.nix (lib.importJSON ./sdk.json)) {
+    python3 = pkgs.python310;
+  };
+
 in {
+  inherit (sdk) sdk sdkFull hosttools;
 
   # Zephyr/west Python environment.
   pythonEnv = callPackage ./python.nix {
     inherit zephyr-src;
     inherit pyproject-nix;
   };
-
-  # Pre-package Zephyr SDK.
-  sdk = callPackage
-    ({ stdenv
-     , which
-     , cmake
-     , autoPatchelfHook
-     , libxcrypt-legacy
-     , ncurses
-     , python3
-     , targets ? [ ]
-     }:
-      let
-        platform = getPlatform stdenv;
-        arch = getArch stdenv;
-      in
-      stdenv.mkDerivation {
-        pname = "zephyr-sdk";
-        inherit version;
-
-        srcs = [
-          (fetchSDKFile "zephyr-sdk-${version}_${platform}-${arch}_minimal.tar.xz")
-        ] ++ map fetchSDKFile (map (target: "toolchain_${platform}-${arch}_${target}.tar.xz") targets);
-
-        passthru = {
-          inherit platform arch targets;
-        };
-
-        nativeBuildInputs =
-          [ which cmake ]
-          ++ lib.optional (!stdenv.isDarwin) autoPatchelfHook
-          ;
-
-        buildInputs = [ stdenv.cc.cc ncurses libxcrypt-legacy python3 ];
-
-        dontBuild = true;
-        dontUseCmakeConfigure = true;
-
-        sourceRoot = ".";
-
-        installPhase = ''
-          runHook preInstall
-
-          rm -f zephyr-sdk-$version/zephyr-sdk-${arch}-hosttools-standalone-*.sh
-          rm -f env-vars
-
-          mv zephyr-sdk-$version $out
-
-          if [ -n "$(ls -A .)" ]; then
-            mv * $out
-          fi
-
-          mkdir -p $out/nix-support
-          cat <<EOF >> $out/nix-support/setup-hook
-          export ZEPHYR_SDK_INSTALL_DIR=$out
-          EOF
-
-          runHook postInstall
-        '';
-      })
-    sdkArgs;
-
-  # # SDK with all targets selected
-  sdkFull =
-    let
-      inherit (self.sdk.passthru) platform arch;
-      mToolchain = builtins.match "toolchain_${platform}-${arch}_(.+)\.tar\.xz";
-      allTargets = map (x: builtins.head (mToolchain x)) (builtins.filter (f: mToolchain f != null) (lib.attrNames sdk'.files));
-    in
-    self.sdk.override {
-      targets = allTargets;
-    };
-
-  # Binary host tools provided by the Zephyr project.
-  hosttools = callPackage
-    ({ stdenv
-     , which
-     , autoPatchelfHook
-     , python3
-     }:
-      let
-        platform = getPlatform stdenv;
-        arch = getArch stdenv;
-      in
-      stdenv.mkDerivation {
-        pname = "zephyr-sdk-hosttools";
-        inherit version;
-
-        src = fetchSDKFile "hosttools_${platform}-${arch}.tar.xz";
-
-        nativeBuildInputs =
-          [ which ]
-          ++ lib.optional (!stdenv.isDarwin) autoPatchelfHook
-          ;
-
-        buildInputs = [ python3 ];
-
-        dontBuild = true;
-        dontFixup = true;
-
-        sourceRoot = ".";
-
-        installPhase = ''
-          runHook preInstall
-          mkdir -p $out/usr/share/zephyr/hosttools
-          ./zephyr-sdk-${arch}-hosttools-standalone-*.sh -d $out/usr/share/zephyr/hosttools
-          ln -s $out/usr/share/zephyr/hosttools/sysroots/${arch}-pokysdk-${platform}/usr/bin $out/bin
-          runHook postInstall
-        '';
-      })
-    sdkArgs;
 
   openocd-zephyr = openocd.overrideAttrs(old: let
     pname = "openocd-zephyr";
