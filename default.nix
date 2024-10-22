@@ -2,7 +2,7 @@
 , pyproject-nix
 , lib
 , fetchurl
-, python38
+, python310
 , newScope
 , openocd
 , gcc_multi
@@ -32,7 +32,7 @@ let
   };
 
   sdkArgs = {
-    python3 = python38;
+    python3 = python310;
   };
 
 in
