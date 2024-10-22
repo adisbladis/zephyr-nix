@@ -52,6 +52,8 @@ in {
      , which
      , cmake
      , autoPatchelfHook
+     , libxcrypt-legacy
+     , ncurses
      , python3
      , targets ? [ ]
      }:
@@ -76,7 +78,7 @@ in {
           ++ lib.optional (!stdenv.isDarwin) autoPatchelfHook
           ;
 
-        buildInputs = [ stdenv.cc.cc python3 ];
+        buildInputs = [ stdenv.cc.cc ncurses libxcrypt-legacy python3 ];
 
         dontBuild = true;
         dontUseCmakeConfigure = true;
