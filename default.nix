@@ -12,12 +12,19 @@
 lib.makeScope newScope (self: let
   inherit (self) callPackage;
 
-  sdk = callPackage (import ./sdk.nix (lib.importJSON ./sdk.json)) {
-    python3 = pkgs.python310;
-  };
+  mkSdk = version: args: callPackage (import ./sdk.nix (lib.importJSON ./sdks/${version}.json)) args;
+
+  sdks = lib.fix (self: {
+    "0_17" = mkSdk "0_17" {
+      python3 = pkgs.python310;
+    };
+
+    latest = self."0_17";
+  });
 
 in {
-  inherit (sdk) sdk sdkFull hosttools;
+  inherit (sdks.latest) sdk sdkFull hosttools;
+  inherit sdks;
 
   # Zephyr/west Python environment.
   pythonEnv = callPackage ./python.nix {
