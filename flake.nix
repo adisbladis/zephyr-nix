@@ -47,7 +47,19 @@
         checks = self.packages;
 
         githubActions = nix-github-actions.lib.mkGithubMatrix {
-          checks = nixpkgs.lib.getAttrs [ "x86_64-linux" ] self.checks;
+          # Filter out unversioned (latest SDK) attributes for less CI jobs.
+          # These are also tested as explicitly versioned attributes.
+          checks = lib.mapAttrs (
+            _:
+            lib.filterAttrs (
+              attr: _:
+              !lib.elem attr [
+                "hosttools"
+                "sdk"
+                "sdkFull"
+              ]
+            )
+          ) (nixpkgs.lib.getAttrs [ "x86_64-linux" ] self.checks);
         };
 
         packages = forAllSystems (
