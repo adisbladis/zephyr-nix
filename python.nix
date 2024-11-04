@@ -5,6 +5,7 @@
 , gitlint
 , lib
 , extraPackages ? _ps: [ ]
+, pkgs
 }:
 
 let
@@ -17,6 +18,12 @@ let
 
       # Nixpkgs has incorrect canonical naming
       python-can = super.python-can or self.can;
+
+      # Nixpkgs puts imgtool in the top-level set as mcuboot-imgtool since 2024-10
+      imgtool =
+        if pkgs ? mcuboot-imgtool then pkgs.mcuboot-imgtool.override {
+          python3Packages = self;
+        } else super.imgtool;
 
       # Upstream bug. Bz is not a valid pypi package.
       bz = null;
