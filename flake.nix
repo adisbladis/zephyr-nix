@@ -7,7 +7,7 @@
     pyproject-nix.url = "github:nix-community/pyproject.nix";
     pyproject-nix.inputs.nixpkgs.follows = "nixpkgs";
 
-    nixpkgs-python.url = "github:cachix/nixpkgs-python";
+    nixpkgs-python.url = "github:adisbladis/nixpkgs-python/nixpkgs-darwin-sdk-refactor";
     nixpkgs-python.inputs.nixpkgs.follows = "nixpkgs";
 
     zephyr.url = "github:zephyrproject-rtos/zephyr/v3.7.0";

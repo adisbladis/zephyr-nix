@@ -139,15 +139,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1729194050,
-        "narHash": "sha256-ExjfoHbwutLkHAcHGhrem6EcmQ/1+ClCr/0Y9NoPPkk=",
-        "owner": "cachix",
+        "lastModified": 1730691144,
+        "narHash": "sha256-n4cibCp/ggDlSacCTnP8dVnywclQKYcHy6PRfe35Hk0=",
+        "owner": "adisbladis",
         "repo": "nixpkgs-python",
-        "rev": "5e4f20785932a23847191607d84c8806520454f2",
+        "rev": "f02b5b345ee90dd20c9c5655a8f37850e2b1d06d",
         "type": "github"
       },
       "original": {
-        "owner": "cachix",
+        "owner": "adisbladis",
+        "ref": "nixpkgs-darwin-sdk-refactor",
         "repo": "nixpkgs-python",
         "type": "github"
       }
