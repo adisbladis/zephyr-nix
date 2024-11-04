@@ -12,6 +12,9 @@
 
     zephyr.url = "github:zephyrproject-rtos/zephyr/v3.7.0";
     zephyr.flake = false;
+
+    nix-github-actions.url = "github:nix-community/nix-github-actions";
+    nix-github-actions.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -21,6 +24,7 @@
       zephyr,
       pyproject-nix,
       nixpkgs-python,
+      nix-github-actions,
     }:
     (
       let
@@ -41,6 +45,10 @@
       in
       {
         checks = self.packages;
+
+        githubActions = nix-github-actions.lib.mkGithubMatrix {
+          checks = nixpkgs.lib.getAttrs [ "x86_64-linux" "aarch64-darwin" ] self.checks;
+        };
 
         packages = forAllSystems (
           system:
