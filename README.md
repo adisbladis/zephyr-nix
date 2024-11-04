@@ -93,6 +93,32 @@ mkShell {
 }
 ```
 
+## Using specific SDK versions
+
+`zephyr-nix` packages multiple Zephyr SDK versions that can be accessed by their versioned attributes.
+
+- Classic Nix
+```
+{ pkgs, zephyr-nix }:
+pkgs.mkShell {
+  packages = [
+    zephyr-nix.sdks."0.16".sdkFull
+  ];
+}
+```
+
+- Flakes
+
+Flake output schema requires packages to be flat, so the nested SDKs sets are folded into the top-level:
+
+```
+devShells.x86_64-linux.default = pkgs.mkShell {
+  packages = [
+    zephyr-nix.packages.x86_64-linux.sdkFull-0_16
+  ];
+};
+```
+
 ## Building a west project with Nix
 
 For building [west](https://docs.zephyrproject.org/latest/develop/west/index.html) projects with Nix you can use [west2nix](https://github.com/adisbladis/west2nix).
