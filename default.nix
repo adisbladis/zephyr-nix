@@ -7,7 +7,6 @@
 , autoreconfHook
 , fetchFromGitHub
 , python310
-, python38
 }:
 
 lib.makeScope newScope (self: let

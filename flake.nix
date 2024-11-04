@@ -7,9 +7,6 @@
     pyproject-nix.url = "github:nix-community/pyproject.nix";
     pyproject-nix.inputs.nixpkgs.follows = "nixpkgs";
 
-    nixpkgs-python.url = "github:adisbladis/nixpkgs-python/nixpkgs-darwin-sdk-refactor";
-    nixpkgs-python.inputs.nixpkgs.follows = "nixpkgs";
-
     zephyr.url = "github:zephyrproject-rtos/zephyr/v3.7.0";
     zephyr.flake = false;
 
@@ -23,7 +20,6 @@
       nixpkgs,
       zephyr,
       pyproject-nix,
-      nixpkgs-python,
       nix-github-actions,
     }:
     (
@@ -70,7 +66,6 @@
             packages' = pkgs.callPackage ./. {
               zephyr-src = zephyr;
               inherit pyproject-nix;
-              python38 = nixpkgs-python.packages.${system}."3.8";
             };
 
             sdks' = removeAttrs packages'.sdks [ "latest" ];
