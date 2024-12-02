@@ -1,5 +1,4 @@
-{ zephyr-src
-, pyproject-nix
+{ pyproject-nix
 , lib
 , newScope
 , openocd
@@ -32,7 +31,12 @@ in {
 
   # Zephyr/west Python environment.
   pythonEnv = callPackage ./python.nix {
-    inherit zephyr-src;
+    zephyr-src = fetchFromGitHub {
+      owner = "zephyrproject-rtos";
+      repo = "zephyr";
+      rev = "v3.7.0";
+      hash = "sha256-rmOHH0uRU27U2T4w4+FEMcAcuiZ7W7p4vOwtSwiAFNY=";
+    };
     inherit pyproject-nix;
   };
 
