@@ -19,6 +19,11 @@ let
       # Nixpkgs has incorrect canonical naming
       python-can = super.python-can or self.can;
 
+      # Upstream bug. Network tests for canopen-2.3.0 may fail due to fragile timing assumptions
+      canopen = super.canopen.overridePythonAttrs (old: {
+        doCheck = false;
+      });
+
       # Nixpkgs puts imgtool in the top-level set as mcuboot-imgtool since 2024-10
       imgtool =
         if pkgs ? mcuboot-imgtool then pkgs.mcuboot-imgtool.override {
