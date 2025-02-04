@@ -35,6 +35,34 @@ let
 
       # HACK: Older Zephyr depends on these missing dependencies
       sphinxcontrib-svg2pdfconverter = super.sphinxcontrib-svg2pdfconverter or null;
+
+      # see: https://github.com/NixOS/nixpkgs/issues/375763
+      anytree = super.anytree.overrideAttrs (old: {
+        patches = old.patches ++ [ ./python-anytree-poetry-project-name-version.patch ];
+      });
+
+      sphinx-lint = self.buildPythonPackage rec {
+        pname = "sphinx-lint";
+        version = "1.0.0";
+        format = "wheel";
+
+        src = pkgs.fetchurl {
+          url = "https://files.pythonhosted.org/packages/31/d2/a130ffba531af7cbbb0e7ad24c7d577d3de0b797437f61d3a7234ed6d836/sphinx_lint-1.0.0-py3-none-any.whl";
+          hash = "sha256-YReg80Cy3HPq38V9t1MdRHfgkp+SoMGi9h5u28Jy8Lw=";
+        };
+
+        propagatedBuildInputs = with self; [
+          polib
+          regex
+        ];
+
+        meta = with lib; {
+          description = "Check for stylistic and formal issues in .rst and .py files included in the documentation.";
+          homepage = "https://github.com/sphinx-contrib/sphinx-lint";
+          # license = licenses.python;
+          maintainers = with maintainers; [ ];
+        };
+      };
     };
   };
 
