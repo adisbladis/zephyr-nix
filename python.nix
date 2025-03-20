@@ -9,9 +9,9 @@
 }:
 
 let
-  python = python3.override {
+  python = python3.override (old: {
     self = python;
-    packageOverrides = self: super: {
+    packageOverrides = self: super: ({
       # HACK: Zephyr uses pypi to install non-Python deps
       clang-format = clang-tools_17;
       inherit gitlint;
@@ -35,8 +35,8 @@ let
 
       # HACK: Older Zephyr depends on these missing dependencies
       sphinxcontrib-svg2pdfconverter = super.sphinxcontrib-svg2pdfconverter or null;
-    };
-  };
+    } // (if old ? packageOverrides then (old.packageOverrides self super) else {}));
+  });
 
   project = pyproject-nix.lib.project.loadRequirementsTxt {
     requirements = zephyr-src + "/scripts/requirements.txt";
