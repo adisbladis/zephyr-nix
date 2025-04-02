@@ -33,6 +33,13 @@ let
       # Upstream bug. Bz is not a valid pypi package.
       bz = null;
 
+      # Nixpkgs has moved gcovr to the top-level namespace
+      gcovr =
+        if super ? gcovr then super.gcovr
+        else pkgs.gcovr.override {
+          python3Packages = self;
+        };
+
       # HACK: Older Zephyr depends on these missing dependencies
       sphinxcontrib-svg2pdfconverter = super.sphinxcontrib-svg2pdfconverter or null;
     };
