@@ -62,7 +62,7 @@ in {
      , dtc
      , nettle
      , openocd-zephyr
-     , qemu_full
+     , qemu
      , shared-mime-info
      }: stdenv.mkDerivation {
       name = "zephyr-sdk-hosttools-nix";
@@ -75,7 +75,7 @@ in {
         dtc
         nettle
         openocd-zephyr
-        qemu_full
+        qemu
         shared-mime-info
       ]
       ++ lib.optional (stdenv.hostPlatform.system == "x86_64-linux") gcc_multi
