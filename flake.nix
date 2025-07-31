@@ -7,7 +7,7 @@
     pyproject-nix.url = "github:nix-community/pyproject.nix";
     pyproject-nix.inputs.nixpkgs.follows = "nixpkgs";
 
-    zephyr.url = "github:zephyrproject-rtos/zephyr/v4.0.0";
+    zephyr.url = "github:zephyrproject-rtos/zephyr/v4.2.0";
     zephyr.flake = false;
 
     nix-github-actions.url = "github:nix-community/nix-github-actions";
