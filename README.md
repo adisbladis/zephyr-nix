@@ -77,7 +77,7 @@ mkShell {
     zephyr.url = "github:zephyrproject-rtos/zephyr/v3.5.0";
     zephyr.flake = false;
 
-    zephyr-nix.url = "github:adisbladis/zephyr-nix";
+    zephyr-nix.url = "github:nix-community/zephyr-nix";
     zephyr-nix.inputs.nixpkgs.follows = "nixpkgs";
     zephyr-nix.inputs.zephyr.follows = "zephyr";
   };
