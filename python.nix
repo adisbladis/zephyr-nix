@@ -1,7 +1,7 @@
 { python3
 , zephyr-src
 , pyproject-nix
-, clang-tools_17
+, clang-tools
 , gitlint
 , lib
 , extraPackages ? _ps: [ ]
@@ -11,7 +11,7 @@
 let
   packageOverrides = self: super: {
     # HACK: Zephyr uses pypi to install non-Python deps
-    clang-format = clang-tools_17;
+    clang-format = clang-tools;
     inherit gitlint;
 
     # Nixpkgs has incorrect canonical naming
