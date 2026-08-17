@@ -70,10 +70,14 @@ let
       preBuild = (old.preBuild or "") + ''
         export HOME=$(mktemp -d)
       '';
+      # Upstream pins the build backend to versions that Nixpkgs does not
+      # have. Remove the version constraints from the build requirements.
+      #
+      # This replaces the Nixpkgs postPatch on purpose. Nixpkgs patches the
+      # same constraints with literal strings, and those strings change with
+      # each spsdk release.
       postPatch = ''
-        substituteInPlace pyproject.toml \
-          --replace-warn "setuptools>=72.1,<74" "setuptools" \
-          --replace-warn "setuptools_scm<8.2" "setuptools_scm"
+        sed -i -E 's/"(setuptools([_-]scm)?)[^"]*"/"\1"/g' pyproject.toml
       '';
     });
 
