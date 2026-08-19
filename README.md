@@ -93,6 +93,24 @@ mkShell {
 }
 ```
 
+## Overriding Python packages
+
+To change a single Python package, use the `packageOverrides` argument of `pythonEnv`. This works
+on the `packages` output, so you do not need your own `nixpkgs`:
+
+``` nix
+zephyr-nix.packages.x86_64-linux.pythonEnv.override {
+  packageOverrides = final: prev: {
+    spsdk = prev.spsdk.overridePythonAttrs (old: {
+      postPatch = "";
+    });
+  };
+}
+```
+
+These overrides are applied last, so they take precedence over the overrides that `zephyr-nix`
+applies itself.
+
 ## Using your own nixpkgs
 
 The `packages` output is built from the `nixpkgs` input of `zephyr-nix`, so it does not see your
