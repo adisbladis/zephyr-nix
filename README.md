@@ -102,7 +102,7 @@ mkShell {
 { pkgs, zephyr-nix }:
 pkgs.mkShell {
   packages = [
-    zephyr-nix.sdks."0.16".sdkFull
+    zephyr-nix.sdks."0_16".sdkFull
   ];
 }
 ```
