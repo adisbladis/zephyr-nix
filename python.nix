@@ -99,9 +99,11 @@ let
 
   python = python3.override (old: {
     self = python;
+    # The caller wins. The overrides of the incoming python3 come from a
+    # nixpkgs overlay, so they take precedence over the overrides below.
     packageOverrides = lib.composeManyExtensions [
-      (old.packageOverrides or (_self: _super: { }))
       zephyrPackageOverrides
+      (old.packageOverrides or (_self: _super: { }))
       packageOverrides
     ];
   });

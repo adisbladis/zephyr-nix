@@ -111,10 +111,15 @@ zephyr-nix.packages.x86_64-linux.pythonEnv.override {
 These overrides are applied last, so they take precedence over the overrides that `zephyr-nix`
 applies itself.
 
+A `pythonPackagesExtensions` overlay cannot win, because Nixpkgs applies it before the
+`packageOverrides` of the interpreter. Use the argument above for the packages that `zephyr-nix`
+patches.
+
 ## Using your own nixpkgs
 
 The `packages` output is built from the `nixpkgs` input of `zephyr-nix`, so it does not see your
 overlays. Use the overlay or `lib.mkZephyr` to build `zephyr-nix` against your own package set.
+Both apply your own overrides of `python3` before the ones of `zephyr-nix`, so your overrides win.
 
 ### Overlay
 
