@@ -63,6 +63,24 @@ mkShell {
 }
 ```
 
+## Classic Nix usage
+
+`zephyr-nix` works without flakes. Call it with `callPackage` and you get the same attributes:
+
+``` nix
+{ pkgs ? import <nixpkgs> { } }:
+
+let
+  zephyr-nix-src = builtins.fetchTarball "https://github.com/nix-community/zephyr-nix/archive/master.tar.gz";
+  zephyr = pkgs.callPackage zephyr-nix-src { };
+in
+pkgs.callPackage ./shell.nix { inherit zephyr; }
+```
+
+`zephyr-nix` reads the pins of Zephyr and of its other inputs from its own `flake.lock`, so both
+entry points use the same revisions. Your own `nixpkgs` stays your choice. Pass `zephyr-src` to
+build against another Zephyr version.
+
 ## Flakes usage
 
 - `flake.nix`

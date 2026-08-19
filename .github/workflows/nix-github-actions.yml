@@ -19,6 +19,34 @@ jobs:
           matrix="$(nix eval --json '.#githubActions.matrix')"
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
 
+  classic-nix:
+    name: Classic Nix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: cachix/install-nix-action@v30
+      - name: Instantiate without flakes
+        run: |
+          set -Eeu
+          nix-instantiate --expr '
+            let
+              lock = import ./lock.nix;
+              pkgs = import lock.nixpkgs { };
+              zephyr = pkgs.callPackage ./. { };
+            in
+            [
+              zephyr.pythonEnv
+              zephyr.sdk
+              zephyr.hosttools-nix
+              zephyr.sdks."0_16".sdk
+            ]
+          ' | sort > classic.txt
+      - name: Compare the classic derivations with the flake
+        run: |
+          set -Eeu
+          nix path-info --derivation .#pythonEnv .#sdk .#hosttools-nix .#sdk-0_16 | sort > flake.txt
+          diff classic.txt flake.txt
+
   nix-build:
     name: ${{ matrix.name }} (${{ matrix.system }})
     needs: nix-matrix

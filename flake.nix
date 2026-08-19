@@ -52,9 +52,7 @@
           }:
           pkgs.callPackage ./. {
             inherit zephyr-src pyproject-nix;
-            python310 =
-              pkgs.python310 or uv-python.packages.${pkgs.stdenv.hostPlatform.system}."cpython-3.10";
-            python312 = pkgs.python312;
+            uv-python-src = uv-python;
           };
       in
       {
