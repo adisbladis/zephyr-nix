@@ -42,8 +42,26 @@
           "packages"
           "sdks"
         ];
+
+        # Build zephyr-nix against a package set provided by the caller.
+        # This lets downstream flakes apply their own overlays.
+        mkZephyr =
+          {
+            pkgs,
+            zephyr-src ? zephyr,
+          }:
+          pkgs.callPackage ./. {
+            inherit zephyr-src pyproject-nix;
+            uv-python-src = uv-python;
+          };
       in
       {
+        lib.mkZephyr = mkZephyr;
+
+        overlays.default = final: _prev: {
+          zephyr-nix = mkZephyr { pkgs = final; };
+        };
+
         checks = self.packages;
 
         githubActions = nix-github-actions.lib.mkGithubMatrix {
@@ -67,12 +85,7 @@
           let
             pkgs = nixpkgs.legacyPackages.${system};
 
-            packages' = pkgs.callPackage ./. {
-              zephyr-src = zephyr;
-              inherit pyproject-nix;
-              python310 = pkgs.python310 or uv-python.packages.${system}."cpython-3.10";
-              python312 = pkgs.python312;
-            };
+            packages' = mkZephyr { inherit pkgs; };
 
             sdks' = removeAttrs packages'.sdks [ "latest" ];
 

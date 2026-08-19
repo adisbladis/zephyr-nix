@@ -5,11 +5,14 @@
 , gitlint
 , lib
 , extraPackages ? _ps: [ ]
+  # Python package overrides from the caller.
+  # These are applied last, so they take precedence over every other layer.
+, packageOverrides ? _self: _super: { }
 , pkgs
 }:
 
 let
-  packageOverrides = self: super: {
+  zephyrPackageOverrides = self: super: {
     inherit gitlint;
     # HACK: Zephyr uses pypi to install non-Python deps
     clang-format = clang-tools;
@@ -96,9 +99,13 @@ let
 
   python = python3.override (old: {
     self = python;
-    packageOverrides =
-      if old ? packageOverrides then lib.composeExtensions old.packageOverrides packageOverrides
-      else packageOverrides;
+    # The caller wins. The overrides of the incoming python3 come from a
+    # nixpkgs overlay, so they take precedence over the overrides below.
+    packageOverrides = lib.composeManyExtensions [
+      zephyrPackageOverrides
+      (old.packageOverrides or (_self: _super: { }))
+      packageOverrides
+    ];
   });
 
   project = pyproject-nix.lib.project.loadRequirementsTxt {

@@ -63,6 +63,24 @@ mkShell {
 }
 ```
 
+## Classic Nix usage
+
+`zephyr-nix` works without flakes. Call it with `callPackage` and you get the same attributes:
+
+``` nix
+{ pkgs ? import <nixpkgs> { } }:
+
+let
+  zephyr-nix-src = builtins.fetchTarball "https://github.com/nix-community/zephyr-nix/archive/master.tar.gz";
+  zephyr = pkgs.callPackage zephyr-nix-src { };
+in
+pkgs.callPackage ./shell.nix { inherit zephyr; }
+```
+
+`zephyr-nix` reads the pins of Zephyr and of its other inputs from its own `flake.lock`, so both
+entry points use the same revisions. Your own `nixpkgs` stays your choice. Pass `zephyr-src` to
+build against another Zephyr version.
+
 ## Flakes usage
 
 - `flake.nix`
@@ -93,6 +111,82 @@ mkShell {
 }
 ```
 
+## Overriding Python packages
+
+To change a single Python package, use the `packageOverrides` argument of `pythonEnv`. This works
+on the `packages` output, so you do not need your own `nixpkgs`:
+
+``` nix
+zephyr-nix.packages.x86_64-linux.pythonEnv.override {
+  packageOverrides = final: prev: {
+    spsdk = prev.spsdk.overridePythonAttrs (old: {
+      postPatch = "";
+    });
+  };
+}
+```
+
+These overrides are applied last, so they take precedence over the overrides that `zephyr-nix`
+applies itself.
+
+A `pythonPackagesExtensions` overlay cannot win, because Nixpkgs applies it before the
+`packageOverrides` of the interpreter. Use the argument above for the packages that `zephyr-nix`
+patches.
+
+## Using your own nixpkgs
+
+The `packages` output is built from the `nixpkgs` input of `zephyr-nix`, so it does not see your
+overlays. Use the overlay or `lib.mkZephyr` to build `zephyr-nix` against your own package set.
+Both apply your own overrides of `python3` before the ones of `zephyr-nix`, so your overrides win.
+
+### Overlay
+
+Add `overlays.default` to your package set and use `pkgs.zephyr-nix`:
+
+``` nix
+  outputs = { self, nixpkgs, zephyr-nix, ... }: let
+    pkgs = import nixpkgs {
+      system = "x86_64-linux";
+      overlays = [
+        zephyr-nix.overlays.default
+        # Your own overlays are applied here
+      ];
+    };
+
+    zephyr = pkgs.zephyr-nix;
+  in {
+    # Use the same devShell as documented above
+  };
+```
+
+This is also the way to use `zephyr-nix` from a NixOS or a home-manager configuration:
+
+``` nix
+nixpkgs.overlays = [ zephyr-nix.overlays.default ];
+```
+
+### lib.mkZephyr
+
+Call `lib.mkZephyr` with a package set that you build yourself:
+
+``` nix
+    zephyr = zephyr-nix.lib.mkZephyr { inherit pkgs; };
+```
+
+`mkZephyr` also takes an optional `zephyr-src`, which defaults to the `zephyr` input of
+`zephyr-nix`. Point it at your own Zephyr checkout to read `scripts/requirements.txt` from there.
+
+### The result
+
+Both ways return the classic Nix attribute set. The SDK versions stay nested in `sdks`, and the set
+keeps `override` and `overrideScope`, so you can replace an input of `zephyr-nix` itself:
+
+``` nix
+zephyr.overrideScope (final: prev: {
+  openocd-zephyr = prev.openocd-zephyr.overrideAttrs (old: { ... });
+})
+```
+
 ## Using specific SDK versions
 
 `zephyr-nix` packages multiple Zephyr SDK versions that can be accessed by their versioned attributes.
@@ -102,7 +196,7 @@ mkShell {
 { pkgs, zephyr-nix }:
 pkgs.mkShell {
   packages = [
-    zephyr-nix.sdks."0.16".sdkFull
+    zephyr-nix.sdks."0_16".sdkFull
   ];
 }
 ```

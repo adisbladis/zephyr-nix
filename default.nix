@@ -1,12 +1,21 @@
-{ zephyr-src
-, pyproject-nix
-, lib
+let
+  # The defaults below make this file work without flakes. They read the pins
+  # from flake.lock, so both entry points use the same revisions.
+  lock = import ./lock.nix;
+in
+
+{ lib
 , newScope
 , openocd
 , gcc_multi
 , autoreconfHook
 , fetchFromGitHub
-, python310 ? null
+, zephyr-src ? lock.zephyr
+, pyproject-nix ? import lock.pyproject-nix { inherit lib; }
+, uv-python-src ? lock.uv-python
+  # Nixpkgs dropped python310. `callPackage` fills this argument in when the
+  # package set still has it, otherwise build a pre-packaged binary.
+, python310 ? (newScope { } (import uv-python-src { }) { })."cpython-3.10"
 , python312 ? null
 }:
 
