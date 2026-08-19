@@ -60,6 +60,10 @@
       {
         lib.mkZephyr = mkZephyr;
 
+        overlays.default = final: _prev: {
+          zephyr-nix = mkZephyr { pkgs = final; };
+        };
+
         checks = self.packages;
 
         githubActions = nix-github-actions.lib.mkGithubMatrix {

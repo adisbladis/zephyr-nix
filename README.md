@@ -96,27 +96,48 @@ mkShell {
 ## Using your own nixpkgs
 
 The `packages` output is built from the `nixpkgs` input of `zephyr-nix`, so it does not see your
-overlays. To build `zephyr-nix` against your own package set, call `lib.mkZephyr`.
+overlays. Use the overlay or `lib.mkZephyr` to build `zephyr-nix` against your own package set.
+
+### Overlay
+
+Add `overlays.default` to your package set and use `pkgs.zephyr-nix`:
 
 ``` nix
   outputs = { self, nixpkgs, zephyr-nix, ... }: let
     pkgs = import nixpkgs {
       system = "x86_64-linux";
       overlays = [
+        zephyr-nix.overlays.default
         # Your own overlays are applied here
       ];
     };
 
-    zephyr = zephyr-nix.lib.mkZephyr { inherit pkgs; };
+    zephyr = pkgs.zephyr-nix;
   in {
     # Use the same devShell as documented above
   };
 ```
 
+This is also the way to use `zephyr-nix` from a NixOS or a home-manager configuration:
+
+``` nix
+nixpkgs.overlays = [ zephyr-nix.overlays.default ];
+```
+
+### lib.mkZephyr
+
+Call `lib.mkZephyr` with a package set that you build yourself:
+
+``` nix
+    zephyr = zephyr-nix.lib.mkZephyr { inherit pkgs; };
+```
+
 `mkZephyr` also takes an optional `zephyr-src`, which defaults to the `zephyr` input of
 `zephyr-nix`. Point it at your own Zephyr checkout to read `scripts/requirements.txt` from there.
 
-The result is the classic Nix attribute set. The SDK versions stay nested in `sdks`, and the set
+### The result
+
+Both ways return the classic Nix attribute set. The SDK versions stay nested in `sdks`, and the set
 keeps `override` and `overrideScope`, so you can replace an input of `zephyr-nix` itself:
 
 ``` nix
