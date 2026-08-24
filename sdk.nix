@@ -9,27 +9,27 @@ let
     let
       gnuPrefix = (if builtins.compareVersions version "1.0.0" >= 0 then "gnu_" else "");
     in
-    if stdenv.isLinux then
+    if stdenv.hostPlatform.isLinux then
       "${gnuPrefix}linux"
-    else if stdenv.isDarwin then
+    else if stdenv.hostPlatform.isDarwin then
       "${gnuPrefix}macos"
     else
       throw "Unsupported platform";
 
   getPlatform =
     stdenv:
-    if stdenv.isLinux then
+    if stdenv.hostPlatform.isLinux then
       "linux"
-    else if stdenv.isDarwin then
+    else if stdenv.hostPlatform.isDarwin then
       "macos"
     else
       throw "Unsupported platform";
 
   getArch =
     stdenv:
-    if stdenv.isAarch64 then
+    if stdenv.hostPlatform.isAarch64 then
       "aarch64"
-    else if stdenv.isx86_64 then
+    else if stdenv.hostPlatform.isx86_64 then
       "x86_64"
     else
       throw "Unsupported arch";
@@ -88,7 +88,7 @@ in {
       nativeBuildInputs = [
         which
         cmake
-      ] ++ lib.optional (!stdenv.isDarwin) autoPatchelfHook;
+      ] ++ lib.optional (!stdenv.hostPlatform.isDarwin) autoPatchelfHook;
 
       buildInputs = [
         stdenv.cc.cc
@@ -182,7 +182,7 @@ in {
 
       src = fetchSDKFile "hosttools_${platform}-${arch}.tar.xz";
 
-      nativeBuildInputs = [ which ] ++ lib.optional (!stdenv.isDarwin) autoPatchelfHook;
+      nativeBuildInputs = [ which ] ++ lib.optional (!stdenv.hostPlatform.isDarwin) autoPatchelfHook;
 
       buildInputs = [ python3 ];
 
